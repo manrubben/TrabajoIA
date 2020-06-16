@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn import model_selection
 from sklearn import tree
 from sklearn import preprocessing
@@ -8,8 +9,6 @@ breast_cancer_dataset = 'docs/breast_cancer_dataset.csv'
 
 titanic = pd.read_csv(titanic_dataset, header=None, delimiter=',', names=['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 'Age_band', 
 'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married', 'Survived']) # se lee el csv y se indican el nombre de las columnas
-
-
 
 atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos
 objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
@@ -47,18 +46,26 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
         scores = model_selection.cross_val_score(estimator=clasif_arbol_decision, X=atributos_prueba, y=objetivo_prueba, cv=CV, scoring='balanced_accuracy')
         print('Score: ',scores)
         print('Promedio: ',scores.mean())
+    
+    return scores
 
 
 def algoritmo_sfs(dataset, atributos, objetivo, D):
     solucion_actual = []
     k=0
-    print(atributos)
+    #print(atributos)
     while k < D:
+        print('Iteracion: ',k)
         for v in atributos:
-            solucion_temporal = solucion_actual.append(v)
-            print(solucion_temporal)
-           # metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)   
+            solucion_actual = np.append(solucion_actual, dataset[v], axis=None)
+            solucion_temporal = solucion_actual
+            #print('Solucion actual',solucion_actual)
+            #print('Solucion temporal',solucion_temporal)
+            scores = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
+            print(scores)
+            #print('===============================')
         k=k+1
+        
 
 
 
