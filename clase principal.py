@@ -18,11 +18,11 @@ objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
 
 def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
 
-    codificador_atributos = preprocessing.OrdinalEncoder()
-    codificador_atributos.fit(atributos)
+    codificador_atributos = preprocessing.OrdinalEncoder() # Codificador adecuado para los atributos
+    codificador_atributos.fit(atributos) 
     atributos_codificados = codificador_atributos.transform(atributos)
 
-    codificador_objetivo = preprocessing.LabelEncoder()
+    codificador_objetivo = preprocessing.LabelEncoder() # Codificador adecuado para el objetivo
     objetivo_codificado = codificador_objetivo.fit_transform(objetivo)
 
     print(codificador_objetivo.classes_)  # Clases detectadas por el codificador para la variable objetivo
@@ -48,6 +48,21 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
         print('Score: ',scores)
         print('Promedio: ',scores.mean())
 
+
+def algoritmo_sfs(dataset, atributos, objetivo, D):
+    solucion_actual = []
+    k=0
+    print(atributos)
+    while k < D:
+        for v in atributos:
+            solucion_temporal = solucion_actual.append(v)
+            print(solucion_temporal)
+           # metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)   
+        k=k+1
+
+
+
     
 
-metodo_evaluacion_robusta(titanic, atributos_titanic, objetivo_titanic, 1, 10)
+#metodo_evaluacion_robusta(titanic, atributos_titanic, objetivo_titanic, 1, 10)
+algoritmo_sfs(titanic, atributos_titanic, objetivo_titanic, 5)
