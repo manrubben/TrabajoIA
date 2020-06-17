@@ -12,6 +12,8 @@ titanic = pd.read_csv(titanic_dataset, header=None, delimiter=',', names=['Pclas
 
 atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos
 objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
+print(atributos_titanic.shape)
+print(objetivo_titanic.shape)
 # N_EXP = 1
 # CV = 3
 
@@ -20,23 +22,26 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
     codificador_atributos = preprocessing.OrdinalEncoder() # Codificador adecuado para los atributos
     codificador_atributos.fit(atributos) 
     atributos_codificados = codificador_atributos.transform(atributos)
+    #print('Atributos codificados: ',atributos_codificados)
+    print('Tamaño x: ',atributos_codificados.shape)
 
     codificador_objetivo = preprocessing.LabelEncoder() # Codificador adecuado para el objetivo
     objetivo_codificado = codificador_objetivo.fit_transform(objetivo)
+    print('Tamaño y: ',objetivo_codificado.shape)
+    
+    #print(codificador_objetivo.classes_)  # Clases detectadas por el codificador para la variable objetivo
+    #print('Objetivo codificado: ',objetivo_codificado)
+    #print(codificador_objetivo.inverse_transform([0, 1])) #Ordena alfabéticamente
 
-    print(codificador_objetivo.classes_)  # Clases detectadas por el codificador para la variable objetivo
-    print(objetivo_codificado)
-    print(codificador_objetivo.inverse_transform([0, 1])) #Ordena alfabéticamente
-
-    print(dataset.shape[0])  # Cantidad total de ejemplos
-    print(pd.Series(objetivo).value_counts(normalize=True))  # Frecuencia total de cada clase de aceptabilidad
+    #print(dataset.shape[0])  # Cantidad total de ejemplos
+    #print(pd.Series(objetivo).value_counts(normalize=True))  # Frecuencia total de cada clase de aceptabilidad
 
     # Dividimos en conjuntos de entrenamiento y prueba los atributos y el objetivo codificado
     atributos_entrenamiento, atributos_prueba, objetivo_entrenamiento, objetivo_prueba = model_selection.train_test_split(
     atributos_codificados, objetivo_codificado,  # Conjuntos de datos a dividir, usando los mismos índices para ambos
     random_state=12345,  # Valor de la semilla aleatoria, para que el muestreo sea reproducible, a pesar de ser aleatorio
     test_size=.20  # Tamaño del conjunto de prueba
-    )  # Estratificamos respecto a la distribución de valores en la variable objetivo
+    )  
 
     clasif_arbol_decision = tree.DecisionTreeClassifier() # creamos el clasificador
     clasif_arbol_decision.fit(X=atributos_entrenamiento, y=objetivo_entrenamiento)
@@ -45,29 +50,34 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
         print('Iteración: ',i)
         scores = model_selection.cross_val_score(estimator=clasif_arbol_decision, X=atributos_prueba, y=objetivo_prueba, cv=CV, scoring='balanced_accuracy')
         print('Score: ',scores)
+        promedio = scores.mean()
         print('Promedio: ',scores.mean())
     
-    return scores
+    return promedio
 
 
-def algoritmo_sfs(dataset, atributos, objetivo, D):
+def algoritmo_sfs(dataset, D):
     solucion_actual = []
+
     k=0
-    #print(atributos)
+    variables_predictoras = dataset.columns.tolist()
+    print(variables_predictoras)
+    nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
+    objetivo = dataset[nombre_objetivo]
     while k < D:
-        print('Iteracion: ',k)
-        for v in atributos:
-            #solucion_actual = np.append(solucion_actual, dataset[v], axis=None)
-            sol = [] 
-            sol.append(dataset[v])
-            solucion_actual.append(sol)
+        variables_sin_añadir = list(set(variables_predictoras) - set(solucion_actual))
+        for v in variables_sin_añadir:
+            lista_scores = []
+            solucion_actual.append(dataset[v])
             solucion_temporal = solucion_actual
-            #print('Solucion actual',solucion_actual)
-            #print('Solucion temporal',solucion_temporal)
-            scores = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
-            print(scores)
-            #print('===============================')
+            #print(solucion_temporal)
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
+            lista_scores.append(score)
+        mejor_solucion_temporal = np.amax(lista_scores)
+        solucion_actual = mejor_solucion_temporal
         k=k+1
+
+
         
 
 
@@ -75,4 +85,4 @@ def algoritmo_sfs(dataset, atributos, objetivo, D):
     
 
 #metodo_evaluacion_robusta(titanic, atributos_titanic, objetivo_titanic, 1, 10)
-algoritmo_sfs(titanic, atributos_titanic, objetivo_titanic, 5)
+algoritmo_sfs(titanic, 5)
