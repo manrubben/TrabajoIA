@@ -7,7 +7,10 @@ titanic_dataset = 'docs/titanic.csv'
 
 titanic = pd.read_csv(titanic_dataset, header=None, delimiter=',', names=['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 'Age_band', 
 'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married', 'Survived']) # se lee el csv y se indican el nombre de las columnas
-
+h = titanic.columns.tolist()
+print(h)
+h.pop(len(h)-1)
+print(h)
 atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos
 objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
 
@@ -17,9 +20,7 @@ codificador_atributos.fit(atributos_titanic)
 variables_predictoras = ['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 'Age_band', 
                             'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married']
 
-v = 'Pclass'
-columna = titanic[v]
-print(columna)
+
 #for v in variables_predictoras:
 #    print(v)
 
@@ -48,3 +49,30 @@ print(columna)
 
 #for i in range(10):
 #    print(i)
+
+def algoritmo_sfs(dataset, D):
+    solucion_actual = []
+    k=0
+    variables_predictoras = dataset.columns.tolist()
+    objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
+    print('Variables predictoras: ', variables_predictoras)
+    print('Objetivo: ', objetivo)
+    #nsamples, nx, ny = dataset.shape
+    #d2_dataset = dataset.reshape((nsamples, nx*ny))
+    #print(atributos)
+    while k < D:
+        print('Iteracion: ',k)
+        variables_sin_añadir = list(set(variables_predictoras) - set(solucion_actual))
+        print('Solucion actual: ', solucion_actual)
+        print('Variables sin añadir: ',variables_sin_añadir)
+        for v in variables_sin_añadir:
+            solucion_actual = np.append(solucion_actual, v, axis=None)
+            #sol = [] 
+            #sol.append(dataset[v])
+            #solucion_actual.append(sol)
+            #solucion_temporal = solucion_actual
+            #print('Solucion actual',solucion_actual)
+            #print('Solucion temporal',solucion_temporal)
+            #scores = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
+            #print(scores)
+        k=k+1
