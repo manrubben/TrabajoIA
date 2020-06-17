@@ -57,7 +57,10 @@ def algoritmo_sfs(dataset, atributos, objetivo, D):
     while k < D:
         print('Iteracion: ',k)
         for v in atributos:
-            solucion_actual = np.append(solucion_actual, dataset[v], axis=None)
+            #solucion_actual = np.append(solucion_actual, dataset[v], axis=None)
+            sol = [] 
+            sol.append(dataset[v])
+            solucion_actual.append(sol)
             solucion_temporal = solucion_actual
             #print('Solucion actual',solucion_actual)
             #print('Solucion temporal',solucion_temporal)
