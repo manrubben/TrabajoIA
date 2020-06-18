@@ -58,29 +58,37 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
 
 def algoritmo_sfs(dataset, D):
     solucion_actual = []
-
+    solucion = []
     k=0
     variables_predictoras = dataset.columns.tolist()
-    print(variables_predictoras)
+    
     nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
     objetivo = dataset[nombre_objetivo]
+    variables_sin_añadir = variables_predictoras
     while k < D:
-        variables_sin_añadir = variables_predictoras#list(set(variables_predictoras) - set(solucion_actual))
+        #variables_sin_añadir = list(set(variables_predictoras) - set(solucion_actual))
+        print('Variables sin añadir: ', variables_sin_añadir)
         i=1
         lista_scores = []
         for v in variables_sin_añadir:
             solucion_actual.append(dataset[v])
+            #print('Solucion actual: ', solucion_actual)
             solucion_temporal = solucion_actual
             solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
             #print(solucion_temporal)
-            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
             lista_scores.append(score)
             i=i+1
         print('Lista de scores: ',lista_scores)
-        mejor_solucion_temporal = np.amax(lista_scores)
-        solucion_actual.append(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
-        variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
-        print('Solucion actual: ',solucion_actual)
+        mejor_promedio = np.amax(lista_scores)
+        mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
+        print('Mejor solucion temporal: ', mejor_solucion_temporal)
+        solucion_actual = []
+        solucion.append(mejor_solucion_temporal)
+        print('Solucion: ', solucion)
+        #solucion_actual.append(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
+        variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
+        #print('Solucion actual: ',solucion_actual)
         k=k+1
 
 
