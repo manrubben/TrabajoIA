@@ -65,16 +65,22 @@ def algoritmo_sfs(dataset, D):
     nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
     objetivo = dataset[nombre_objetivo]
     while k < D:
-        variables_sin_añadir = list(set(variables_predictoras) - set(solucion_actual))
+        variables_sin_añadir = variables_predictoras#list(set(variables_predictoras) - set(solucion_actual))
+        i=1
+        lista_scores = []
         for v in variables_sin_añadir:
-            lista_scores = []
             solucion_actual.append(dataset[v])
             solucion_temporal = solucion_actual
+            solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
             #print(solucion_temporal)
             score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
             lista_scores.append(score)
+            i=i+1
+        print(lista_scores)
         mejor_solucion_temporal = np.amax(lista_scores)
-        solucion_actual = mejor_solucion_temporal
+        solucion_actual = variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)]
+        variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
+        print(solucion_actual)
         k=k+1
 
 
