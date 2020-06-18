@@ -90,7 +90,49 @@ def algoritmo_sfs(dataset, D):
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
         #print('Solucion actual: ',solucion_actual)
         k=k+1
+    
+    return solucion
 
+
+def algoritmo_sffs(dataset):
+    solucion_actual = []
+    añadidos = []
+    eliminados = []
+    k=0
+
+    variables_predictoras = dataset.columns.tolist()
+    solucion = []
+
+    while !condicion_de_parada: #La condicion de parada es que añadidos contenga todas las variables predictoras
+        i=1
+        for v in variables_predictoras:
+            solucion_actual.append(dataset[v])
+            solucion_temporal = solucion_actual
+            solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
+            lista_scores.append(score)
+            i=i+1
+        mejor_promedio = np.amax(lista_scores)
+        mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
+        #solucion_actual = []
+        solucion.append(mejor_solucion_temporal)
+        añadidos.append(mejor_solucion_temporal)
+
+        for v in variables_predictoras: #hay que recorrer todas las variables que no esten en eliminados
+            solucion_actual.remove(dataset[v])
+            solucion_temporal = solucion_actual
+            solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
+            lista_scores.append(score)
+            i=i+1
+        mejor_promedio2 = np.amax(lista_scores)
+        mejor_solucion_temporal2 = variables_sin_añadir[lista_scores.index(mejor_promedio)]
+        if mejor_promedio2 > mejor_promedio:
+            solucion_actual.append(mejor_solucion_temporal2)
+            eliminados.append(mejor_solucion_temporal)
+            mejor_solucion_temporal = mejor_solucion_temporal2
+
+        print('Mejor solucion temporal: ', mejor_solucion_temporal)
 
         
 
