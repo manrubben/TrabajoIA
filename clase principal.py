@@ -76,11 +76,11 @@ def algoritmo_sfs(dataset, D):
             score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 10)
             lista_scores.append(score)
             i=i+1
-        print(lista_scores)
+        print('Lista de scores: ',lista_scores)
         mejor_solucion_temporal = np.amax(lista_scores)
-        solucion_actual = variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)]
+        solucion_actual.append(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
-        print(solucion_actual)
+        print('Solucion actual: ',solucion_actual)
         k=k+1
 
 
