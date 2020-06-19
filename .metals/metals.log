@@ -1,0 +1,18 @@
+2020.06.14 13:17:25 INFO  started: Metals version 0.9.0 in workspace 'C:\Users\Manu\Documents\TrabajoIA2\TrabajoIA'
+2020.06.14 13:17:26 INFO  time: initialize in 1.34s
+2020.06.14 13:17:29 WARN  no build tool detected in workspace 'C:\Users\Manu\Documents\TrabajoIA2\TrabajoIA'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+jun 14, 2020 3:45:10 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFORMACIÓN: Unsupported notification method: $/setTraceNotification
+jun 16, 2020 3:36:00 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFORMACIÓN: Unsupported notification method: $/setTraceNotification
+jun 16, 2020 3:36:01 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFORMACIÓN: Unsupported notification method: $/setTraceNotification
+jun 16, 2020 3:36:06 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFORMACIÓN: Unsupported notification method: $/setTraceNotification
+jun 16, 2020 3:36:07 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFORMACIÓN: Unsupported notification method: $/setTraceNotification
+2020.06.17 21:22:59 INFO  shutting down Metals
+2020.06.18 13:40:38 INFO  started: Metals version 0.9.0 in workspace 'C:\Users\Manu\Documents\TrabajoIA2\TrabajoIA'
+2020.06.18 13:40:39 INFO  time: initialize in 1.03s
+2020.06.18 13:40:46 WARN  no build tool detected in workspace 'C:\Users\Manu\Documents\TrabajoIA2\TrabajoIA'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2020.06.18 13:45:18 INFO  shutting down Metals

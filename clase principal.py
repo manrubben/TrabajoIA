@@ -90,8 +90,13 @@ def algoritmo_sfs(dataset, D):
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
         #print('Solucion actual: ',solucion_actual)
         k=k+1
-    
-    return solucion
+
+    print("\nTabla respuesta:\n")
+    for j in range (0,D):
+        frame_data={'solution':solucion, 'score':mejor_promedio}
+    df=pd.DataFrame(frame_data)
+
+    return df.sort_values(by=['score'],ascending = False)
 
 
 def algoritmo_sffs(dataset):
@@ -114,6 +119,7 @@ def algoritmo_sffs(dataset):
         i=len(solucion_actual)+1
         lista_scores = []
         print('Añadidos: ', añadidos)
+        print('Eliminados: ', eliminados)
         print('Variables sin añadir: ', variables_sin_añadir)
         for v in variables_sin_añadir:
             solucion_actual.append(dataset[v])
@@ -140,8 +146,9 @@ def algoritmo_sffs(dataset):
             print('Variable: ', v)
             #print('indice: ', variables_sin_eliminar.index(v))
             #print('Solucion actual: ', solucion_actual)
+            print('Variables sin eliminar: ', variables_sin_eliminar)
+            print('index: ', variables_sin_eliminar.index(v))
             solucion_actual.remove(solucion_actual[variables_sin_eliminar.index(v)])
-            variables_sin_eliminar.remove(v)
             solucion_temporal = solucion_actual
             #print('Solucion actual: ', solucion_actual)
             if len(solucion_actual) > 0:
