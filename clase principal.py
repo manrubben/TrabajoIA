@@ -112,12 +112,16 @@ def algoritmo_sffs(dataset):
     variables_sin_añadir = dataset.columns.tolist()
     nombre_objetivo2 = variables_sin_añadir.pop(len(variables_sin_añadir)-1)
     #print('variables sin añadir: ', variables_sin_añadir)
-    variables_sin_eliminar = dataset.columns.tolist()
+    
+    
     objetivo = dataset[nombre_objetivo]
     solucion = []
     while not (len(añadidos)==len(variables_predictoras) and k==10): #La condicion de parada es que añadidos contenga todas las variables predictoras
+        print('iteracion: ', k)
         i=len(solucion_actual)+1
         lista_scores = []
+        variables_sin_eliminar = dataset.columns.tolist()
+        nombre_objetivo3 = variables_sin_eliminar.pop(len(variables_sin_eliminar)-1)
         print('Añadidos: ', añadidos)
         print('Eliminados: ', eliminados)
         print('Variables sin añadir: ', variables_sin_añadir)
@@ -149,8 +153,9 @@ def algoritmo_sffs(dataset):
             print('Variables sin eliminar: ', variables_sin_eliminar)
             print('index: ', variables_sin_eliminar.index(v))
             solucion_actual.remove(solucion_actual[variables_sin_eliminar.index(v)])
-            solucion_temporal = solucion_actual
+            variables_sin_eliminar.remove(v)
             #print('Solucion actual: ', solucion_actual)
+            solucion_temporal = solucion_actual
             if len(solucion_actual) > 0:
                 solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
                 score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
