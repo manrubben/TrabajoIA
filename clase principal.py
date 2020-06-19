@@ -104,7 +104,7 @@ def algoritmo_sffs(dataset):
     añadidos = []
     eliminados = []
     k=0
-
+    lista_auxiliar = []
     variables_predictoras = dataset.columns.tolist()
     #print('Variables predictoras iniciales: ', variables_predictoras)
     nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
@@ -113,10 +113,11 @@ def algoritmo_sffs(dataset):
     nombre_objetivo2 = variables_sin_añadir.pop(len(variables_sin_añadir)-1)
     #print('variables sin añadir: ', variables_sin_añadir)
     
-    
+    variables = dataset.columns.tolist()
+    nombre_objetivo3 = variables.pop(len(variables)-1)
     objetivo = dataset[nombre_objetivo]
     solucion = []
-    while not (len(añadidos)==len(variables_predictoras) and k==10): #La condicion de parada es que añadidos contenga todas las variables predictoras
+    while not (len(añadidos)==len(variables) and k==10): #La condicion de parada es que añadidos contenga todas las variables predictoras
         print('iteracion: ', k)
         i=len(solucion_actual)+1
         lista_scores = []
@@ -124,7 +125,6 @@ def algoritmo_sffs(dataset):
         nombre_objetivo3 = variables_sin_eliminar.pop(len(variables_sin_eliminar)-1)
         print('Añadidos: ', añadidos)
         print('Eliminados: ', eliminados)
-        print('Variables sin añadir: ', variables_sin_añadir)
         for v in variables_sin_añadir:
             solucion_actual.append(dataset[v])
             solucion_temporal = solucion_actual
@@ -136,25 +136,15 @@ def algoritmo_sffs(dataset):
         print('Mejor promedio: ', mejor_promedio)
         mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
         print('Mejor solucion temporal: ', mejor_solucion_temporal)
-        #solucion_actual = []
         solucion.append(mejor_solucion_temporal)
         añadidos.append(mejor_solucion_temporal)
-        #print('variables predictoras 2: ', variables_predictoras)
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
-        #print('variables predictoras 3: ', variables_predictoras)
         i=i-1
         
         for v in variables_predictoras: #hay que recorrer todas las variables que no esten en eliminados
-            print('Variables predictoras: ', variables_predictoras)
             i=i-1
-            print('Variable: ', v)
-            #print('indice: ', variables_sin_eliminar.index(v))
-            #print('Solucion actual: ', solucion_actual)
-            print('Variables sin eliminar: ', variables_sin_eliminar)
-            print('index: ', variables_sin_eliminar.index(v))
             solucion_actual.remove(solucion_actual[variables_sin_eliminar.index(v)])
             variables_sin_eliminar.remove(v)
-            #print('Solucion actual: ', solucion_actual)
             solucion_temporal = solucion_actual
             if len(solucion_actual) > 0:
                 solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
@@ -165,12 +155,18 @@ def algoritmo_sffs(dataset):
         mejor_solucion_temporal2 = variables_sin_añadir[lista_scores.index(mejor_promedio)]
         if mejor_promedio2 > mejor_promedio:
             print('======')
-            solucion_actual.append(dataset[mejor_solucion_temporal2])
+            #solucion_actual.append(dataset[mejor_solucion_temporal2])
+            lista_auxiliar.append(mejor_solucion_temporal2)
             eliminados.append(mejor_solucion_temporal)
+            variables_predictoras.remove(mejor_solucion_temporal)
             mejor_solucion_temporal = mejor_solucion_temporal2
             k=0
         else:
-            solucion_actual.append(dataset[mejor_solucion_temporal])
+            lista_auxiliar.append(mejor_solucion_temporal)
+            #solucion_actual.append(dataset[mejor_solucion_temporal])
+
+        for l in lista_auxiliar:
+            solucion_actual.append(dataset[l])
 
         k=k+1
         print('Mejor solucion temporal 2: ', mejor_solucion_temporal)
