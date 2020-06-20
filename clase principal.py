@@ -4,16 +4,29 @@ from sklearn import model_selection
 from sklearn import tree
 from sklearn import preprocessing
 
-titanic_dataset = 'docs/titanic2.csv'
-breast_cancer_dataset = 'docs/breast_cancer_dataset.csv'
+titanic_dataset = 'docs/titanic.csv'
+breast_cancer_dataset = 'docs/breastCancerDataset.csv'
 
-titanic = pd.read_csv(titanic_dataset, header=None, delimiter=',', names=['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 'Age_band', 
-'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married', 'Survived']) # se lee el csv y se indican el nombre de las columnas
+titanic = pd.read_csv(titanic_dataset, header=0, delimiter=',', names=['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 
+'Age_band', 'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married', 'Survived']) # se lee el csv y 
+                                                                                            #se indican el nombre de las columnas
 
-atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos
-objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
-print(atributos_titanic.shape)
-print(objetivo_titanic.shape)
+cancer = pd.read_csv(breast_cancer_dataset, header=0, delimiter=',', names=['mean radius', 'mean texture', 'mean perimeter', 'mean area', 
+'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension', 'radius error', 
+'texture error', 'perimeter error', 'area error', 'smoothness error', 'compactness error', 'concavity error', 'concave points error', 
+'symmetry error', 'fractal dimension error', 'worst radius', 'worst texture', 'worst perimeter', 'worst area', 'worst smoothness', 
+'worst compactness', 'worst concavity', 'worst concave points', 'worst symmetry', 'worst fractal dimension', 'diagnosis'])
+
+atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos del dataset titanic
+objetivo_titanic = titanic['Survived'] # selección de la columna objetivo del dataset titanic
+
+atributos_cancer = cancer.loc[:, 'mean radius':'worst fractal dimension']
+objetivo_cancer = cancer['diagnosis']
+#print(len(objetivo_cancer))
+
+
+#print(atributos_titanic.shape)
+#print(objetivo_titanic)
 # N_EXP = 1
 # CV = 3
 
@@ -22,19 +35,9 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
     codificador_atributos = preprocessing.OrdinalEncoder() # Codificador adecuado para los atributos
     codificador_atributos.fit(atributos) 
     atributos_codificados = codificador_atributos.transform(atributos)
-    #print('Atributos codificados: ',atributos_codificados)
-    #print('Tamaño x: ',atributos_codificados.shape)
 
     codificador_objetivo = preprocessing.LabelEncoder() # Codificador adecuado para el objetivo
     objetivo_codificado = codificador_objetivo.fit_transform(objetivo)
-    #print('Tamaño y: ',objetivo_codificado.shape)
-    
-    #print(codificador_objetivo.classes_)  # Clases detectadas por el codificador para la variable objetivo
-    #print('Objetivo codificado: ',objetivo_codificado)
-    #print(codificador_objetivo.inverse_transform([0, 1])) #Ordena alfabéticamente
-
-    #print(dataset.shape[0])  # Cantidad total de ejemplos
-    #print(pd.Series(objetivo).value_counts(normalize=True))  # Frecuencia total de cada clase de aceptabilidad
 
     # Dividimos en conjuntos de entrenamiento y prueba los atributos y el objetivo codificado
     atributos_entrenamiento, atributos_prueba, objetivo_entrenamiento, objetivo_prueba = model_selection.train_test_split(
@@ -46,15 +49,19 @@ def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
     clasif_arbol_decision = tree.DecisionTreeClassifier() # creamos el clasificador
     clasif_arbol_decision.fit(X=atributos_entrenamiento, y=objetivo_entrenamiento)
 
+    lista_promedios = []
+
     for i in range(N_EXP):
         #print('Iteración: ',i)
         scores = model_selection.cross_val_score(estimator=clasif_arbol_decision, X=atributos_prueba, y=objetivo_prueba, cv=CV, scoring='balanced_accuracy')
         #print('Score: ',scores)
         promedio = scores.mean()
         #print('Promedio: ',scores.mean())
+        lista_promedios.append(promedio)
     
-    return promedio
-
+    media = sum(lista_promedios)/len(lista_promedios)
+    print(media)
+    return media
 
 def algoritmo_sfs(dataset, D):
     solucion_actual = []
@@ -65,16 +72,18 @@ def algoritmo_sfs(dataset, D):
     nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
     objetivo = dataset[nombre_objetivo]
     variables_sin_añadir = variables_predictoras
+    i=1
     while k < D:
-        #variables_sin_añadir = list(set(variables_predictoras) - set(solucion_actual))
         print('Variables sin añadir: ', variables_sin_añadir)
-        i=1
         lista_scores = []
+        lista_sol = []
         for v in variables_sin_añadir:
-            solucion_actual.append(dataset[v])
+            lista_sol = solucion_actual
+            lista_sol.append(dataset[v])
+            #solucion_actual.append(dataset[v])
             #print('Solucion actual: ', solucion_actual)
-            solucion_temporal = solucion_actual
-            solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
+            solucion_temporal = lista_sol
+            solucion_temporal = np.reshape(np.ravel(lista_sol), (len(objetivo),i+k))
             #print(solucion_temporal)
             score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
             lista_scores.append(score)
@@ -83,20 +92,13 @@ def algoritmo_sfs(dataset, D):
         mejor_promedio = np.amax(lista_scores)
         mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
         print('Mejor solucion temporal: ', mejor_solucion_temporal)
-        solucion_actual = []
+        solucion_actual.append(dataset[mejor_solucion_temporal])
         solucion.append(mejor_solucion_temporal)
         print('Solucion: ', solucion)
         #solucion_actual.append(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
         #print('Solucion actual: ',solucion_actual)
         k=k+1
-
-        print("\nTabla respuesta:\n")
-        for j in range (0,D):
-            frame_data={'solution':solucion, 'score':mejor_promedio}
-        df=pd.DataFrame(frame_data)
-
-    return df.sort_values(by=['score'],ascending = False)
 
 
 def algoritmo_sffs(dataset):
@@ -184,6 +186,6 @@ def algoritmo_sffs(dataset):
 
     
 
-#metodo_evaluacion_robusta(titanic, atributos_titanic, objetivo_titanic, 1, 10)
-#algoritmo_sfs(titanic, 5)
-algoritmo_sffs(titanic)
+#metodo_evaluacion_robusta(cancer, atributos_cancer, objetivo_cancer, 10, 10)
+#algoritmo_sfs(cancer, 5)
+#algoritmo_sffs(titanic)

@@ -13,16 +13,12 @@ titanic = pd.read_csv(titanic_dataset, header=None, delimiter=',', names=['Pclas
 atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos
 objetivo_titanic = titanic['Survived'] # selección de la columna objetivo
 
-
 lista = []
-lista.append('Pclass')
-lista.append('sex')
-
-old_index = lista.index('sex')
-print(old_index)
-lista.insert(0, lista.pop(old_index))
+lista1 = ['a', 'b', 'c']
+lista2 = ['d', 'e', 'f']
+lista.append(lista1)
+lista.append(lista2)
 print(lista)
-
 
 
 
