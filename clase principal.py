@@ -7,21 +7,30 @@ from sklearn import preprocessing
 titanic_dataset = 'docs/titanic.csv'
 breast_cancer_dataset = 'docs/breastCancerDataset.csv'
 
-titanic = pd.read_csv(titanic_dataset, header=0, delimiter=',', names=['Pclass', 'sex', 'age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Initial', 
-'Age_band', 'Family_size', 'Alone', 'Fare_cat', 'Deck', 'Title', 'Is_Married', 'Survived']) # se lee el csv y 
-                                                                                            #se indican el nombre de las columnas
+def get_dataset_df(ruta, header):
+    '''
+    El csv con los datos debe tener en la ultima columna el atributo objetivo. El parámetro header debe ser True si el csv
+    contiene header, false en caso contrario. Para que la ruta funcione correctamente, meter el csv en la carpeta docs y pasar
+    la ruta de la siguiente manera: "docs/titanic.csv"
+    Este metodo devuelve los datos del csv como dataframe.
+    '''
+    r = str(ruta)
+    if header == False:
+        dataset = pd.read_csv(r, header=None)
+    if header == True:
+        dataset = pd.read_csv(r)
+    
+    return dataset
 
-cancer = pd.read_csv(breast_cancer_dataset, header=0, delimiter=',', names=['mean radius', 'mean texture', 'mean perimeter', 'mean area', 
-'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension', 'radius error', 
-'texture error', 'perimeter error', 'area error', 'smoothness error', 'compactness error', 'concavity error', 'concave points error', 
-'symmetry error', 'fractal dimension error', 'worst radius', 'worst texture', 'worst perimeter', 'worst area', 'worst smoothness', 
-'worst compactness', 'worst concavity', 'worst concave points', 'worst symmetry', 'worst fractal dimension', 'diagnosis'])
+def get_atributos(dataset):
+    '''
+    Recibe como parámetro el dataframe obtenido en el método get_dataset_df
+    Devuelve las columnas de atributos del dataframe
+    '''
+    columnas = dataset.columns.tolist()
+    atributos = dataset.iloc[:, 0:len(columnas)-1]
 
-atributos_titanic = titanic.loc[:, 'Pclass':'Is_Married'] # selección de las columnas de atributos del dataset titanic
-objetivo_titanic = titanic['Survived'] # selección de la columna objetivo del dataset titanic
-
-atributos_cancer = cancer.loc[:, 'mean radius':'worst fractal dimension']
-objetivo_cancer = cancer['diagnosis']
+    return atributos
 
 def metodo_evaluacion_robusta(dataset, atributos, N_EXP, CV):
 
@@ -179,10 +188,7 @@ def algoritmo_sffs(dataset):
 
         
 
-
-
-    
-
-#metodo_evaluacion_robusta(cancer, atributos_cancer, objetivo_cancer, 10, 10)
-algoritmo_sfs(cancer, 5)
-#algoritmo_sffs(titanic)
+dataset = get_dataset_df(titanic_dataset, True)
+atributos = get_atributos(dataset)
+metodo_evaluacion_robusta(dataset, atributos, 10, 10)
+algoritmo_sfs(dataset, 5)
