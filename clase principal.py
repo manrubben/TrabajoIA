@@ -22,15 +22,12 @@ objetivo_titanic = titanic['Survived'] # selección de la columna objetivo del d
 
 atributos_cancer = cancer.loc[:, 'mean radius':'worst fractal dimension']
 objetivo_cancer = cancer['diagnosis']
-#print(len(objetivo_cancer))
 
+def metodo_evaluacion_robusta(dataset, atributos, N_EXP, CV):
 
-#print(atributos_titanic.shape)
-#print(objetivo_titanic)
-# N_EXP = 1
-# CV = 3
-
-def metodo_evaluacion_robusta(dataset, atributos, objetivo, N_EXP, CV):
+    columnas = dataset.columns.tolist()
+    nombre_objetivo = columnas.pop(len(columnas)-1)
+    objetivo = dataset[nombre_objetivo]
 
     codificador_atributos = preprocessing.OrdinalEncoder() # Codificador adecuado para los atributos
     codificador_atributos.fit(atributos) 
@@ -74,7 +71,7 @@ def algoritmo_sfs(dataset, D):
     variables_sin_añadir = variables_predictoras
     i=1
     while k < D:
-        print('Variables sin añadir: ', variables_sin_añadir)
+        #print('Variables sin añadir: ', variables_sin_añadir)
         lista_scores = []
         lista_sol = []
         for v in variables_sin_añadir:
@@ -85,13 +82,13 @@ def algoritmo_sfs(dataset, D):
             solucion_temporal = lista_sol
             solucion_temporal = np.reshape(np.ravel(lista_sol), (len(objetivo),i+k))
             #print(solucion_temporal)
-            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
             lista_scores.append(score)
             i=i+1
-        print('Lista de scores: ',lista_scores)
+        #print('Lista de scores: ',lista_scores)
         mejor_promedio = np.amax(lista_scores)
         mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
-        print('Mejor solucion temporal: ', mejor_solucion_temporal)
+        #print('Mejor solucion temporal: ', mejor_solucion_temporal)
         solucion_actual.append(dataset[mejor_solucion_temporal])
         solucion.append(mejor_solucion_temporal)
         print('Solucion: ', solucion)
@@ -130,8 +127,8 @@ def algoritmo_sffs(dataset):
         for v in variables_sin_añadir:
             solucion_actual.append(dataset[v])
             solucion_temporal = solucion_actual
-            solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
-            score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
+            solucion_temporal = np.reshape(np.ravel(solucion_actual), (len(objetivo),i))
+            score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
             lista_scores.append(score)
             i=i+1
         mejor_promedio = np.amax(lista_scores)
@@ -153,8 +150,8 @@ def algoritmo_sffs(dataset):
             variables_sin_eliminar.remove(v)
             solucion_temporal = solucion_actual
             if len(solucion_actual) > 0:
-                solucion_temporal = np.reshape(np.ravel(solucion_actual), (891,i))
-                score = metodo_evaluacion_robusta(dataset, solucion_temporal, objetivo, 1, 3)
+                solucion_temporal = np.reshape(np.ravel(solucion_actual), (len(objetivo),i))
+                score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
                 lista_scores.append(score)
             
         mejor_promedio2 = np.amax(lista_scores)
@@ -187,5 +184,5 @@ def algoritmo_sffs(dataset):
     
 
 #metodo_evaluacion_robusta(cancer, atributos_cancer, objetivo_cancer, 10, 10)
-#algoritmo_sfs(cancer, 5)
+algoritmo_sfs(cancer, 5)
 #algoritmo_sffs(titanic)
