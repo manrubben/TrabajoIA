@@ -12,7 +12,7 @@ score = metodo_evaluacion_robusta(titanic, atributos_titanic, objetivo_titanic, 
 
 ### Los parámetros que recibe son:
 
-1. Ruta del dataset a usar. En el caso de que se quieran usar nuevos datasets, se recomienda meterlos en la carpeta "docs".
+1. DataFrame a usar. En el caso de que se quieran usar nuevos datasets, se recomienda meterlos en la carpeta "docs" y posteriormente convertirlo en DataFrame con la funcion pandas.read_csv.
 2. El subconjunto que se va a evaluar.
 3. La columna del dataset que contiene la variable respuesta.
 4. Número de repeticiones del experimento de validación cruzada.
@@ -24,7 +24,7 @@ algoritmo_sfs(cancer, 5)
 
 ### Los parámetros que recibe son:
 
-1. Ruta del dataset a usar. En el caso de que se quieran usar nuevos datasets, se recomienda meterlos en la carpeta "docs".
+1. DataFrame a usar. En el caso de que se quieran usar nuevos datasets, se recomienda meterlos en la carpeta "docs" y posteriormente convertirlo en DataFrame con la funcion pandas.read_csv.
 2. Número máximo de variables a probar.
 
 ## Algoritmo Sequential Floating Forward Selection (SFFS)
