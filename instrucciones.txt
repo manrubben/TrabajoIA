@@ -1,0 +1,16 @@
+ejecutar la siguiente linea de codigo:
+
+dataset = get_dataset_df(ruta, header)
+
+pasandole como parámetros la ruta del dataset y un True si el dataset contiene header,
+o un False en caso contrario
+
+Después ejecutar la linea de codigo:
+
+atributos = get_atributos(dataset)
+
+Y finalmente ejecutar:
+
+algoritmo_sfs(dataset, D)
+
+Donde D es el número de variables máximo a probar
