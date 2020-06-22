@@ -41,7 +41,8 @@ algoritmo_sfs(cancer, 5)
 ### Los parámetros que recibe son:
 
 1. DataFrame a usar
-2. Número máximo de variables a probar.
+2. Número máximo de variables a probar. Este parámetro es opcional, en caso de no 
+proporcionarlo, D será igual al número de variables predictoras
 
 ## Algoritmo Sequential Floating Forward Selection (SFFS)
 

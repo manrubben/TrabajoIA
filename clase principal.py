@@ -4,7 +4,7 @@ from sklearn import model_selection
 from sklearn import tree
 from sklearn import preprocessing
 
-titanic_dataset = 'docs/titanic.csv'
+
 breast_cancer_dataset = 'docs/breastCancerDataset.csv'
 
 def get_dataset_df(ruta, header):
@@ -31,6 +31,7 @@ def get_atributos(dataset):
     atributos = dataset.iloc[:, 0:len(columnas)-1]
 
     return atributos
+
 
 def metodo_evaluacion_robusta(dataset, atributos, N_EXP, CV):
 
@@ -66,45 +67,41 @@ def metodo_evaluacion_robusta(dataset, atributos, N_EXP, CV):
         lista_promedios.append(promedio)
     
     media = sum(lista_promedios)/len(lista_promedios)
-    print(media)
+    #print(media)
     return media
 
-def algoritmo_sfs(dataset, D):
+def algoritmo_sfs(dataset, D=None):
+    
     solucion_actual = []
     solucion = []
     k=0
     variables_predictoras = dataset.columns.tolist()
-    
     nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
+
+    if D is None:
+        D = len(variables_predictoras)
+
     objetivo = dataset[nombre_objetivo]
     variables_sin_añadir = variables_predictoras
     i=1
     while k < D:
-        #print('Variables sin añadir: ', variables_sin_añadir)
         lista_scores = []
         lista_sol = []
         for v in variables_sin_añadir:
-            lista_sol = solucion_actual
+            lista_sol = list(solucion_actual)
             lista_sol.append(dataset[v])
-            #solucion_actual.append(dataset[v])
-            #print('Solucion actual: ', solucion_actual)
-            solucion_temporal = lista_sol
-            solucion_temporal = np.reshape(np.ravel(lista_sol), (len(objetivo),i+k))
-            #print(solucion_temporal)
+            solucion_temporal = list(lista_sol)
+            solucion_temporal = np.reshape(np.ravel(lista_sol), (len(objetivo),1+k))         
             score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
             lista_scores.append(score)
-            i=i+1
-        #print('Lista de scores: ',lista_scores)
+            i=i+1        
         mejor_promedio = np.amax(lista_scores)
-        mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
-        #print('Mejor solucion temporal: ', mejor_solucion_temporal)
+        mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]      
         solucion_actual.append(dataset[mejor_solucion_temporal])
         solucion.append(mejor_solucion_temporal)
-        print('Solucion: ', solucion)
-        #solucion_actual.append(variables_sin_añadir[lista_scores.index(mejor_solucion_temporal)])
         variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
-        #print('Solucion actual: ',solucion_actual)
         k=k+1
+        print('solucion: ', solucion)
 
 
 def algoritmo_sffs(dataset):
@@ -112,83 +109,80 @@ def algoritmo_sffs(dataset):
     añadidos = []
     eliminados = []
     k=0
-    lista_auxiliar_añadidos = []
-    variables_predictoras = dataset.columns.tolist()
-    #print('Variables predictoras iniciales: ', variables_predictoras)
-    nombre_objetivo = variables_predictoras.pop(len(variables_predictoras)-1)
-    #print('Variables predictoras sin objetivo: ', variables_predictoras)
+
     variables_sin_añadir = dataset.columns.tolist()
-    nombre_objetivo2 = variables_sin_añadir.pop(len(variables_sin_añadir)-1)
-    #print('variables sin añadir: ', variables_sin_añadir)
-    
+    variables_sin_eliminar = dataset.columns.tolist()
     variables = dataset.columns.tolist()
+    nombre_objetivo = variables_sin_añadir.pop(len(variables_sin_añadir)-1)
+    nombre_objetivo2 = variables_sin_eliminar.pop(len(variables_sin_eliminar)-1)
     nombre_objetivo3 = variables.pop(len(variables)-1)
     objetivo = dataset[nombre_objetivo]
     solucion = []
-    while not (len(añadidos)==len(variables) and k==10): #La condicion de parada es que añadidos contenga todas las variables predictoras
+    i = 1
+    j=0
+
+    while not (len(añadidos) == len(variables) and k==10):
         print('iteracion: ', k)
-        i=len(solucion_actual)+1
-        lista_scores = []
-        variables_sin_eliminar = dataset.columns.tolist()
-        nombre_objetivo3 = variables_sin_eliminar.pop(len(variables_sin_eliminar)-1)
-        print('Añadidos: ', añadidos)
-        print('Eliminados: ', eliminados)
-        for v in variables_sin_añadir:
-            solucion_actual.append(dataset[v])
-            solucion_temporal = solucion_actual
-            solucion_temporal = np.reshape(np.ravel(solucion_actual), (len(objetivo),i))
-            score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
-            lista_scores.append(score)
-            i=i+1
-        mejor_promedio = np.amax(lista_scores)
-        print('Mejor promedio: ', mejor_promedio)
-        mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]
-        print('Mejor solucion temporal: ', mejor_solucion_temporal)
-        solucion.append(mejor_solucion_temporal)
-        añadidos.append(mejor_solucion_temporal)
-        variables_sin_añadir.remove(mejor_solucion_temporal)
-        i=i-1
         
-        for v in variables_predictoras: #hay que recorrer todas las variables que no esten en eliminados
-            i=i-1
-            print('index: ', variables_sin_eliminar.index(v))
-            if not variables_sin_eliminar.index(v) == 0:
-                old_index = variables_sin_eliminar.index(v)
-                variables_sin_eliminar.insert(0, variables_sin_eliminar.pop(old_index))
-            solucion_actual.remove(solucion_actual[variables_sin_eliminar.index(v)])
-            variables_sin_eliminar.remove(v)
-            solucion_temporal = solucion_actual
-            if len(solucion_actual) > 0:
-                solucion_temporal = np.reshape(np.ravel(solucion_actual), (len(objetivo),i))
-                score = metodo_evaluacion_robusta(dataset, solucion_temporal, 10, 10)
+        lista_scores2 = []
+        lista_sol2 = []
+        if not len(añadidos) == len(variables):
+            lista_scores = []
+            lista_sol = []
+            for v in variables_sin_añadir:
+                lista_sol = list(solucion_actual)
+                lista_sol.append(dataset[v])
+                solucion_temporal = list(lista_sol)
+                solucion_temporal = np.reshape(np.ravel(lista_sol), (len(objetivo),1+j))         
+                score = metodo_evaluacion_robusta(dataset, solucion_temporal, 1, 3)
                 lista_scores.append(score)
-            
-        mejor_promedio2 = np.amax(lista_scores)
-        mejor_solucion_temporal2 = variables_sin_añadir[lista_scores.index(mejor_promedio)]
-        if mejor_promedio2 > mejor_promedio:
-            print('======')
-            #solucion_actual.append(dataset[mejor_solucion_temporal2])
-            lista_auxiliar_añadidos.append(mejor_solucion_temporal2)
-            variables_sin_añadir.remove(mejor_solucion_temporal2)
-            eliminados.append(mejor_solucion_temporal)
-            variables_predictoras.remove(mejor_solucion_temporal)
-            #variables_sin_añadir.remove(mejor_solucion_temporal)
-            mejor_solucion_temporal = mejor_solucion_temporal2
-            k=0
+                i=i+1
+            mejor_promedio = np.amax(lista_scores)
+            mejor_solucion_temporal = variables_sin_añadir[lista_scores.index(mejor_promedio)]      
+            solucion_actual.append(dataset[mejor_solucion_temporal])
+            añadidos.append(mejor_solucion_temporal)
+            solucion.append(mejor_solucion_temporal)
+            variables_sin_añadir.remove(variables_sin_añadir[lista_scores.index(mejor_promedio)])
         else:
-            lista_auxiliar_añadidos.append(mejor_solucion_temporal)
-            #solucion_actual.append(dataset[mejor_solucion_temporal])
+            i=i-1
 
-        for la in lista_auxiliar_añadidos:
-            solucion_actual.append(dataset[la])
-            
+        if not len(solucion) == 1:
 
+            for v in solucion:
+                i=i-1
+                if not variables_sin_eliminar.index(v) == 0:
+                    old_index = variables_sin_eliminar.index(v)
+                    variables_sin_eliminar.insert(0, variables_sin_eliminar.pop(old_index)) 
+                lista_sol2 = list(solucion_actual)
+                lista_sol2.remove(lista_sol2[variables_sin_eliminar.index(v)])
+                solucion_temporal = list(lista_sol2)
+                solucion_temporal = np.reshape(np.ravel(lista_sol2), (len(objetivo), j))
+                score = metodo_evaluacion_robusta(dataset, solucion_temporal, 1, 3)
+                lista_scores2.append(score)
+            mejor_promedio2 = np.amax(lista_scores2)
+            mejor_solucion_temporal2 = variables_sin_eliminar[lista_scores2.index(mejor_promedio2)]
+            if mejor_promedio2 > mejor_promedio:
+                if not solucion.index(mejor_solucion_temporal2) == 0:
+                    old_index = solucion.index(mejor_solucion_temporal2)
+                    solucion.insert(0, solucion.pop(old_index))
+                    solucion_actual.insert(0, solucion_actual.pop(old_index))
+                solucion_actual.remove(solucion_actual[solucion.index(mejor_solucion_temporal2)])
+                variables_sin_eliminar.remove(mejor_solucion_temporal2)
+                eliminados.append(mejor_solucion_temporal2)
+                solucion.remove(mejor_solucion_temporal2)
+                if len(añadidos) == len(variables):
+                    mejor_promedio = mejor_promedio2
+                i=i-1
+                j=j-1
+                k=0
+        if not len(añadidos) == len(variables):
+            j=j+1
         k=k+1
-        print('Mejor solucion temporal 2: ', mejor_solucion_temporal)
+        print('solucion', solucion)
 
         
 
-dataset = get_dataset_df(titanic_dataset, True)
+dataset = get_dataset_df('docs/breastCancerDataset.csv', True)
 atributos = get_atributos(dataset)
-metodo_evaluacion_robusta(dataset, atributos, 10, 10)
-algoritmo_sfs(dataset, 5)
+#metodo_evaluacion_robusta(dataset, atributos, 10, 10)
+algoritmo_sffs(dataset)
